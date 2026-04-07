@@ -1,4 +1,4 @@
-export const GCP_BUCKET_URL = import.meta.env.VITE_GCP_BUCKET_URL || 'https://storage.googleapis.com/jlpt-assets'
+export const GCP_BUCKET_URL = import.meta.env.VITE_GCP_BUCKET_URL || 'https://storage.googleapis.com/test-jlpt'
 
 export function getResourceUrl(path) {
   if (!path || path === 'None') return null
