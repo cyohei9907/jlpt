@@ -1,22 +1,32 @@
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager')
 
-const client = new SecretManagerServiceClient()
+let client = null
+
+function getClient() {
+  if (!client) client = new SecretManagerServiceClient()
+  return client
+}
+
 const cache = {}
 
 async function getSecret(name) {
   if (cache[name]) return cache[name]
 
-  // In local dev, allow env vars to override
+  // Allow env vars to override (local dev or direct config)
   if (process.env[name]) {
     cache[name] = process.env[name]
     return cache[name]
   }
 
   const projectId = process.env.GOOGLE_CLOUD_PROJECT || process.env.GCLOUD_PROJECT
-  const [version] = await client.accessSecretVersion({
+  if (!projectId) throw new Error(`Cannot load secret ${name}: no project ID set`)
+
+  console.log(`Loading secret: ${name} from project ${projectId}`)
+  const [version] = await getClient().accessSecretVersion({
     name: `projects/${projectId}/secrets/${name}/versions/latest`,
   })
   cache[name] = version.payload.data.toString('utf8')
+  console.log(`Secret ${name} loaded (${cache[name].length} chars)`)
   return cache[name]
 }
 
