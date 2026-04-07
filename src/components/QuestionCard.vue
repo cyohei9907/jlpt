@@ -13,13 +13,14 @@
         <img :src="picture" alt="" loading="lazy" />
       </div>
 
-      <AudioPlayer v-if="question.audio && question.audio !== 'None'" :audio="question.audio" />
+      <AudioPlayer v-if="hasAudio" :audio="question.audio" />
 
-      <div class="question-text" v-html="question.question"></div>
+      <div v-if="hasQuestionText" class="question-text" v-html="question.question"></div>
+      <div v-else-if="hasAudio" class="question-hint">音声を聞いて答えてください</div>
 
       <div v-if="question.littleQuestion" class="little-question" v-html="question.littleQuestion"></div>
 
-      <div class="options">
+      <div class="options" v-if="hasOptions">
         <button
           v-for="n in 4"
           :key="n"
@@ -29,6 +30,17 @@
         >
           <span class="option-num">{{ n }}</span>
           <span class="option-text">{{ question[`option${n}`] }}</span>
+        </button>
+      </div>
+      <div v-else-if="hasAudio" class="options">
+        <button
+          v-for="n in 4"
+          :key="n"
+          :class="['option', optionClass(n)]"
+          :disabled="isRevealed"
+          @click="$emit('answer', question.id, n)"
+        >
+          <span class="option-num">{{ n }}</span>
         </button>
       </div>
 
@@ -80,6 +92,14 @@ const props = defineProps({
 const emit = defineEmits(['answer'])
 
 const picture = computed(() => getResourceUrl(props.question.picture))
+const hasAudio = computed(() => props.question.audio && props.question.audio !== 'None')
+const hasQuestionText = computed(() => {
+  const q = props.question.question
+  return q && q.replace(/<[^>]*>/g, '').trim().length > 0
+})
+const hasOptions = computed(() => {
+  return [1, 2, 3, 4].some(n => props.question[`option${n}`]?.trim())
+})
 
 const isCorrect = computed(() => props.userAnswer === props.question.answer)
 
@@ -237,5 +257,11 @@ function extOptionClass(ext, n) {
 }
 .extending-item {
   margin-bottom: 1rem;
+}
+.question-hint {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-bottom: 0.75rem;
 }
 </style>
