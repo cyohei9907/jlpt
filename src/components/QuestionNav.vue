@@ -35,34 +35,35 @@ function getAnswer(id) {
 .question-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
-  padding: 0.5rem 0;
+  gap: 3px;
+  padding: 0.35rem 0;
 }
 .nav-dot {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  border: 2px solid var(--color-border);
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 3px;
+  border: 1px solid var(--color-border);
   background: var(--color-card);
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
+  transition: all 0.1s;
 }
 .nav-dot.current {
   border-color: var(--color-primary);
+  background: var(--color-primary-soft);
   font-weight: 700;
 }
 .nav-dot.correct {
-  background: #d4edda;
-  border-color: #28a745;
-  color: #155724;
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #166534;
 }
 .nav-dot.wrong {
-  background: #f8d7da;
-  border-color: #dc3545;
-  color: #721c24;
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #991b1b;
 }
 </style>

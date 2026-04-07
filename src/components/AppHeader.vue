@@ -1,6 +1,6 @@
 <template>
   <header class="app-header">
-    <router-link to="/" class="logo">JLPT 練習</router-link>
+    <router-link to="/" class="logo">JLPTcraft</router-link>
 
     <!-- Desktop nav -->
     <nav class="header-nav desktop-only">
@@ -119,16 +119,16 @@ function handleLogin() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
+  padding: 0.35rem 0.75rem;
   background: var(--color-card);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 .logo {
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   text-decoration: none;
   color: var(--color-primary);
 }
@@ -137,31 +137,31 @@ function handleLogin() {
 .header-nav {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 .nav-link {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-decoration: none;
   color: var(--color-text);
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
   transition: background 0.15s;
 }
 .nav-link:hover { background: var(--color-bg-soft); }
 .user-info { display: flex; align-items: center; gap: 0.5rem; }
-.avatar { width: 28px; height: 28px; border-radius: 50%; }
+.avatar { width: 22px; height: 22px; border-radius: 50%; }
 .user-name {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .btn-logout {
-  font-size: 0.8rem;
-  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: 4px;
   background: none;
   cursor: pointer;
   color: var(--color-text-muted);
@@ -169,13 +169,13 @@ function handleLogin() {
 .btn-login {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.8rem;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--color-card);
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   transition: all 0.15s;
 }
 .btn-login:hover {

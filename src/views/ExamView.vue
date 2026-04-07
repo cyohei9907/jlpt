@@ -112,40 +112,38 @@ onMounted(load)
 
 <style scoped>
 .exam {
-  max-width: 800px;
+  max-width: 640px;
   margin: 0 auto;
-  padding: 0 1rem 2rem;
+  padding: 0 0.75rem 1.5rem;
 }
 .exam-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 0;
-  position: sticky;
-  top: 0;
-  background: var(--color-bg);
-  z-index: 10;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
 }
 .back-btn {
   color: var(--color-primary);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 .exam-title {
   flex: 1;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   text-align: center;
 }
 .exam-progress {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
 }
 .loading {
   text-align: center;
-  padding: 3rem;
+  padding: 2rem;
   color: var(--color-text-muted);
+  font-size: 0.85rem;
 }
 .questions-scroll {
-  margin-top: 0.5rem;
+  margin-top: 0.35rem;
 }
 </style>

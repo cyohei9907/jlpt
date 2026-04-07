@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="hero">
-      <h1 class="home-title">JLPT 真題練習</h1>
+      <h1 class="home-title">JLPTcraft</h1>
       <p class="home-subtitle">日本語能力試験 過去問題集</p>
     </div>
 
@@ -26,7 +26,7 @@
             :to="`/exam/${exam.level}/${exam.time}`"
             class="month-card"
           >
-            <span class="month-num">{{ exam.time.slice(4) }}月</span>
+            {{ exam.time.slice(4) }}月
           </router-link>
         </div>
       </div>
@@ -67,42 +67,41 @@ function getExamsForYear(year) {
 
 <style scoped>
 .home {
-  max-width: 600px;
+  max-width: 480px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0 1rem 2rem;
 }
 .hero {
   text-align: center;
-  padding: 2.5rem 0 1.5rem;
+  padding: 1.5rem 0 1rem;
 }
 .home-title {
-  font-size: 1.8rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
-  margin-bottom: 0.25rem;
+  letter-spacing: 0.03em;
+  color: var(--color-text);
 }
 .home-subtitle {
   color: var(--color-text-muted);
-  font-size: 0.95rem;
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
 }
-
-/* Level Tabs */
 .level-tabs {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
 }
 .level-tab {
-  padding: 0.6rem 2.5rem;
-  border: 2px solid var(--color-border);
+  padding: 0.3rem 1.6rem;
+  border: 1px solid var(--color-border);
   border-radius: 99px;
   background: var(--color-card);
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
   color: var(--color-text-muted);
-  transition: all 0.2s;
+  transition: all 0.15s;
 }
 .level-tab.active {
   background: var(--color-primary);
@@ -113,65 +112,50 @@ function getExamsForYear(year) {
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
-
-/* Year rows */
 .year-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
 .year-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.5rem 0;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
   border-bottom: 1px solid var(--color-border);
 }
 .year-label {
-  width: 3.5rem;
-  font-size: 1.05rem;
-  font-weight: 700;
+  width: 2.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--color-text);
   flex-shrink: 0;
 }
 .month-cards {
   display: flex;
-  gap: 0.5rem;
-  flex: 1;
+  gap: 0.35rem;
 }
 .month-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1.2rem;
-  border-radius: 8px;
-  background: var(--color-card);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  text-decoration: none;
+  padding: 0.25rem 0.8rem;
+  border-radius: 4px;
+  background: var(--color-bg-soft);
   color: var(--color-text);
-  font-weight: 500;
-  transition: all 0.15s;
+  font-size: 0.8rem;
+  transition: all 0.12s;
 }
 .month-card:hover {
   background: var(--color-primary);
   color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(66, 133, 244, 0.3);
-}
-.month-num {
-  font-size: 0.95rem;
 }
 .show-more {
   display: block;
-  margin: 1rem auto 0;
-  padding: 0.5rem 1.5rem;
+  margin: 0.75rem auto 0;
+  padding: 0.3rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: 99px;
-  background: var(--color-card);
+  background: none;
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   cursor: pointer;
-  transition: all 0.15s;
 }
 .show-more:hover {
   border-color: var(--color-primary);

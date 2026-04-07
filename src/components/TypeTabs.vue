@@ -26,23 +26,23 @@ const labels = TYPE_LABELS
 <style scoped>
 .type-tabs {
   display: flex;
-  gap: 0.25rem;
+  gap: 2px;
   background: var(--color-bg-soft);
-  padding: 0.25rem;
-  border-radius: 8px;
+  padding: 2px;
+  border-radius: 5px;
   overflow-x: auto;
 }
 .tab {
   flex: 1;
-  padding: 0.5rem 0.75rem;
+  padding: 0.3rem 0.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   background: none;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   white-space: nowrap;
   color: var(--color-text-muted);
-  transition: all 0.2s;
+  transition: all 0.15s;
 }
 .tab.active {
   background: var(--color-primary);
