@@ -45,6 +45,7 @@ import { onMounted, watch } from 'vue'
 import { useExam } from '../composables/useExam'
 import { useAuth } from '../composables/useAuth'
 import { useWrongAnswers } from '../composables/useWrongAnswers'
+import { useHistory } from '../composables/useHistory'
 import TypeTabs from '../components/TypeTabs.vue'
 import QuestionNav from '../components/QuestionNav.vue'
 import QuestionCard from '../components/QuestionCard.vue'
@@ -72,15 +73,24 @@ const {
 
 const { isLoggedIn } = useAuth()
 const { saveWrongAnswer } = useWrongAnswers()
+const { savePractice } = useHistory()
+const savedTypes = new Set()
 
 function handleAnswer(questionId, option) {
   selectAnswer(questionId, option)
-  // Save wrong answer if logged in and answer is wrong
-  if (isLoggedIn.value) {
-    const q = currentQuestions.value.find(q => q.id === questionId)
-    if (q && option !== q.answer) {
-      saveWrongAnswer(q, props.level, props.time, option)
-    }
+  if (!isLoggedIn.value) return
+
+  const q = currentQuestions.value.find(q => q.id === questionId)
+  if (q && option !== q.answer) {
+    saveWrongAnswer(q, props.level, props.time, option)
+  }
+
+  // Save history when all questions in current type are answered
+  if (answeredCount.value === totalQuestions.value && !savedTypes.has(currentType.value)) {
+    savedTypes.add(currentType.value)
+    const correctCount = currentQuestions.value.filter(q => userAnswers.value[q.id] === q.answer).length
+    const typeNum = parseInt(currentType.value.split('_')[1])
+    savePractice(props.level, props.time, typeNum, totalQuestions.value, correctCount)
   }
 }
 

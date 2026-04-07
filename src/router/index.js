@@ -11,6 +11,10 @@ const routes = [
     path: '/wrong-answers',
     component: () => import('../views/WrongAnswersView.vue'),
   },
+  {
+    path: '/history',
+    component: () => import('../views/HistoryView.vue'),
+  },
 ]
 
 export default createRouter({

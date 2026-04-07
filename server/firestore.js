@@ -64,4 +64,46 @@ async function getWrongAnswers(userId, { level, type } = {}) {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }))
 }
 
-module.exports = { getOrCreateUser, addWrongAnswer, removeWrongAnswer, getWrongAnswers }
+// Practice history operations
+const historyCol = db.collection('practice_history')
+
+async function addPracticeHistory(userId, { examLevel, examTime, questionType, totalQuestions, correctCount }) {
+  await historyCol.add({
+    userId,
+    examLevel,
+    examTime,
+    questionType,
+    totalQuestions,
+    correctCount,
+    practicedAt: new Date(),
+  })
+}
+
+async function getPracticeHistory(userId) {
+  const snap = await historyCol
+    .where('userId', '==', userId)
+    .orderBy('practicedAt', 'desc')
+    .get()
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+}
+
+async function clearPracticeHistory(userId) {
+  const snap = await historyCol.where('userId', '==', userId).get()
+  const batch = db.batch()
+  snap.docs.forEach(d => batch.delete(d.ref))
+  await batch.commit()
+}
+
+async function deletePracticeHistory(userId, docId) {
+  const doc = historyCol.doc(docId)
+  const snap = await doc.get()
+  if (snap.exists && snap.data().userId === userId) {
+    await doc.delete()
+  }
+}
+
+module.exports = {
+  getOrCreateUser,
+  addWrongAnswer, removeWrongAnswer, getWrongAnswers,
+  addPracticeHistory, getPracticeHistory, clearPracticeHistory, deletePracticeHistory,
+}

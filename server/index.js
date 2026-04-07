@@ -32,6 +32,7 @@ app.use('/api/auth', (req, res, next) => {
 })
 
 app.use('/api/wrong-answers', require('./wrong-answers'))
+app.use('/api/history', require('./history'))
 
 // Serve static frontend in production
 if (process.env.NODE_ENV === 'production') {
