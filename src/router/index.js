@@ -7,6 +7,10 @@ const routes = [
     component: () => import('../views/ExamView.vue'),
     props: true,
   },
+  {
+    path: '/wrong-answers',
+    component: () => import('../views/WrongAnswersView.vue'),
+  },
 ]
 
 export default createRouter({

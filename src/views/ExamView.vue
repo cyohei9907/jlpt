@@ -32,7 +32,7 @@
             :show-title="qi === 0"
             :user-answer="userAnswers[q.id]"
             :is-revealed="!!revealed[q.id]"
-            @answer="selectAnswer"
+            @answer="handleAnswer"
           />
         </template>
       </div>
@@ -43,6 +43,8 @@
 <script setup>
 import { onMounted, watch } from 'vue'
 import { useExam } from '../composables/useExam'
+import { useAuth } from '../composables/useAuth'
+import { useWrongAnswers } from '../composables/useWrongAnswers'
 import TypeTabs from '../components/TypeTabs.vue'
 import QuestionNav from '../components/QuestionNav.vue'
 import QuestionCard from '../components/QuestionCard.vue'
@@ -67,6 +69,20 @@ const {
   switchType,
   selectAnswer,
 } = useExam(props.level, props.time)
+
+const { isLoggedIn } = useAuth()
+const { saveWrongAnswer } = useWrongAnswers()
+
+function handleAnswer(questionId, option) {
+  selectAnswer(questionId, option)
+  // Save wrong answer if logged in and answer is wrong
+  if (isLoggedIn.value) {
+    const q = currentQuestions.value.find(q => q.id === questionId)
+    if (q && option !== q.answer) {
+      saveWrongAnswer(q, props.level, props.time, option)
+    }
+  }
+}
 
 const questionRefs = {}
 

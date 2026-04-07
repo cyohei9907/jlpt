@@ -18,6 +18,8 @@ steps:
       - '--allow-unauthenticated'
       - '--port'
       - '8080'
+      - '--set-env-vars'
+      - 'NODE_ENV=production,GOOGLE_CLOUD_PROJECT=$PROJECT_ID'
 options:
   logging: CLOUD_LOGGING_ONLY
 images:
