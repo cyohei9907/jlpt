@@ -104,7 +104,7 @@ const scorePercent = computed(() =>
 
 const canSubmit = computed(() =>
   isLoggedIn.value &&
-  answeredCount.value === totalQuestions.value &&
+  answeredCount.value > 0 &&
   !isTypeSubmitted.value
 )
 
@@ -136,6 +136,18 @@ function handleAnswer(questionId, option) {
 }
 
 async function handleSubmit() {
+  if (answeredCount.value < totalQuestions.value) {
+    if (!confirm(`まだ${totalQuestions.value - answeredCount.value}問未回答です。提出しますか？`)) return
+  }
+
+  // Reveal all unanswered questions
+  currentQuestions.value.forEach(q => {
+    if (userAnswers.value[q.id] == null) {
+      userAnswers.value[q.id] = -1 // mark as skipped
+    }
+    revealed.value[q.id] = true
+  })
+
   const typeNum = parseInt(currentType.value.split('_')[1])
   const answersMap = {}
   currentQuestions.value.forEach(q => {
