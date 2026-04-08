@@ -7,7 +7,7 @@
 
     <div class="level-tabs">
       <button
-        v-for="level in ['n1', 'n2']"
+        v-for="level in ['n1', 'n2', 'n3']"
         :key="level"
         :class="['level-tab', { active: activeLevel === level }]"
         @click="activeLevel = level; expanded = false"
