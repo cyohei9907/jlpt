@@ -102,8 +102,46 @@ async function deletePracticeHistory(userId, docId) {
   }
 }
 
+// Answer records - save/restore user's answers per exam type
+const answersCol = db.collection('answer_records')
+
+function answerDocId(userId, examLevel, examTime, questionType) {
+  return `${userId}_${examLevel}_${examTime}_${questionType}`
+}
+
+async function saveAnswers(userId, { examLevel, examTime, questionType, answers, submitted }) {
+  const docId = answerDocId(userId, examLevel, examTime, questionType)
+  await answersCol.doc(docId).set({
+    userId,
+    examLevel,
+    examTime,
+    questionType,
+    answers, // { [questionId]: selectedOption }
+    submitted: !!submitted,
+    updatedAt: new Date(),
+  }, { merge: true })
+}
+
+async function getAnswers(userId, examLevel, examTime) {
+  const snap = await answersCol
+    .where('userId', '==', userId)
+    .where('examLevel', '==', examLevel)
+    .where('examTime', '==', examTime)
+    .get()
+  const result = {}
+  snap.docs.forEach(d => {
+    const data = d.data()
+    result[`type_${data.questionType}`] = {
+      answers: data.answers || {},
+      submitted: !!data.submitted,
+    }
+  })
+  return result
+}
+
 module.exports = {
   getOrCreateUser,
   addWrongAnswer, removeWrongAnswer, getWrongAnswers,
   addPracticeHistory, getPracticeHistory, clearPracticeHistory, deletePracticeHistory,
+  saveAnswers, getAnswers,
 }

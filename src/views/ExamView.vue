@@ -22,6 +22,12 @@
         :revealed="revealed"
       />
 
+      <!-- Submitted banner -->
+      <div v-if="isTypeSubmitted" class="submitted-banner">
+        <span class="submitted-score">{{ correctCount }}/{{ totalQuestions }} 正解（{{ scorePercent }}%）</span>
+        <span class="submitted-label">提出済み</span>
+      </div>
+
       <div class="questions-scroll">
         <template v-for="(section, si) in sections" :key="si">
           <QuestionCard
@@ -36,16 +42,24 @@
           />
         </template>
       </div>
+
+      <!-- Submit button -->
+      <div v-if="canSubmit" class="submit-bar">
+        <button class="submit-btn" @click="handleSubmit">
+          この部分を提出する（{{ answeredCount }}/{{ totalQuestions }}）
+        </button>
+      </div>
     </template>
   </div>
 </template>
 
 <script setup>
-import { onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useExam } from '../composables/useExam'
 import { useAuth } from '../composables/useAuth'
 import { useWrongAnswers } from '../composables/useWrongAnswers'
 import { useHistory } from '../composables/useHistory'
+import { fetchSavedAnswers, syncAnswers } from '../composables/useAnswerSync'
 import TypeTabs from '../components/TypeTabs.vue'
 import QuestionNav from '../components/QuestionNav.vue'
 import QuestionCard from '../components/QuestionCard.vue'
@@ -74,23 +88,98 @@ const {
 const { isLoggedIn } = useAuth()
 const { saveWrongAnswer } = useWrongAnswers()
 const { savePractice } = useHistory()
-const savedTypes = new Set()
+
+// Track submitted state per type
+const submittedTypes = ref({})
+
+const isTypeSubmitted = computed(() => !!submittedTypes.value[currentType.value])
+
+const correctCount = computed(() =>
+  currentQuestions.value.filter(q => userAnswers.value[q.id] === q.answer).length
+)
+
+const scorePercent = computed(() =>
+  totalQuestions.value ? Math.round(correctCount.value / totalQuestions.value * 100) : 0
+)
+
+const canSubmit = computed(() =>
+  isLoggedIn.value &&
+  answeredCount.value === totalQuestions.value &&
+  !isTypeSubmitted.value
+)
+
+// Debounce sync timer
+let syncTimer = null
 
 function handleAnswer(questionId, option) {
   selectAnswer(questionId, option)
   if (!isLoggedIn.value) return
 
+  // Save wrong answer
   const q = currentQuestions.value.find(q => q.id === questionId)
   if (q && option !== q.answer) {
     saveWrongAnswer(q, props.level, props.time, option)
   }
 
-  // Save history when all questions in current type are answered
-  if (answeredCount.value === totalQuestions.value && !savedTypes.has(currentType.value)) {
-    savedTypes.add(currentType.value)
-    const correctCount = currentQuestions.value.filter(q => userAnswers.value[q.id] === q.answer).length
+  // Debounced sync to server
+  clearTimeout(syncTimer)
+  syncTimer = setTimeout(() => {
     const typeNum = parseInt(currentType.value.split('_')[1])
-    savePractice(props.level, props.time, typeNum, totalQuestions.value, correctCount)
+    const answersMap = {}
+    currentQuestions.value.forEach(q => {
+      if (userAnswers.value[q.id] != null) {
+        answersMap[q.id] = userAnswers.value[q.id]
+      }
+    })
+    syncAnswers(props.level, props.time, typeNum, answersMap, false)
+  }, 1000)
+}
+
+async function handleSubmit() {
+  const typeNum = parseInt(currentType.value.split('_')[1])
+  const answersMap = {}
+  currentQuestions.value.forEach(q => {
+    if (userAnswers.value[q.id] != null) {
+      answersMap[q.id] = userAnswers.value[q.id]
+    }
+  })
+
+  // Mark as submitted
+  await syncAnswers(props.level, props.time, typeNum, answersMap, true)
+
+  // Save practice history
+  await savePractice(props.level, props.time, typeNum, totalQuestions.value, correctCount.value)
+
+  submittedTypes.value = { ...submittedTypes.value, [currentType.value]: true }
+}
+
+// Restore saved answers on load
+async function loadWithAnswers() {
+  await load()
+
+  if (!isLoggedIn.value) return
+
+  const saved = await fetchSavedAnswers(props.level, props.time)
+  if (!saved || !Object.keys(saved).length) return
+
+  // Restore answers for all types
+  for (const [typeKey, record] of Object.entries(saved)) {
+    if (!record.answers) continue
+
+    // Get questions for this type
+    const questions = currentType.value === typeKey
+      ? currentQuestions.value
+      : [] // We'll just restore into userAnswers directly
+
+    for (const [qId, option] of Object.entries(record.answers)) {
+      const numId = Number(qId)
+      userAnswers.value[numId] = option
+      revealed.value[numId] = true
+    }
+
+    if (record.submitted) {
+      submittedTypes.value = { ...submittedTypes.value, [typeKey]: true }
+    }
   }
 }
 
@@ -107,7 +196,7 @@ watch(currentIndex, (idx) => {
   }
 })
 
-onMounted(load)
+onMounted(loadWithAnswers)
 </script>
 
 <style scoped>
@@ -143,7 +232,47 @@ onMounted(load)
   color: var(--color-text-muted);
   font-size: 0.85rem;
 }
+.submitted-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.6rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 4px;
+  margin: 0.35rem 0;
+  font-size: 0.78rem;
+}
+.submitted-score {
+  font-weight: 600;
+  color: #166534;
+}
+.submitted-label {
+  color: #22c55e;
+  font-size: 0.7rem;
+}
 .questions-scroll {
   margin-top: 0.35rem;
+}
+.submit-bar {
+  position: sticky;
+  bottom: 0;
+  padding: 0.5rem 0;
+  background: var(--color-bg);
+}
+.submit-btn {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.submit-btn:hover {
+  opacity: 0.9;
 }
 </style>
